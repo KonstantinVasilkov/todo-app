@@ -1,18 +1,172 @@
-# todo-app
+<a id="readme-top"></a>
 
-A minimal personal task tracker: a FastAPI + SQLite backend and a React single-page app,
-available in English and Russian.
+<div align="center">
+  <img src=".github/assets/logo.svg" width="96" height="96" alt="todo-app logo">
+
+  <h1>todo-app</h1>
+
+  <p><b>A minimal personal task tracker with a typed contract from the database to the UI.</b></p>
+  <p>FastAPI and SQLite on the back, React on the front, English and Russian out of the box,<br>deployed with a single <code>docker compose up</code>.</p>
+
+  <p>
+    <a href="https://github.com/KonstantinVasilkov/todo-app/actions/workflows/ci.yml"><img src="https://github.com/KonstantinVasilkov/todo-app/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/github/license/KonstantinVasilkov/todo-app" alt="License: MIT"></a>
+    <img src="https://img.shields.io/badge/python-3.14-3776AB?logo=python&logoColor=white" alt="Python 3.14">
+    <img src="https://img.shields.io/badge/typescript-6-3178C6?logo=typescript&logoColor=white" alt="TypeScript 6">
+    <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
+    <a href="https://github.com/astral-sh/ty"><img src="https://img.shields.io/badge/types-ty-261230" alt="Type checked with ty"></a>
+    <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv"></a>
+  </p>
+
+  <p>
+    <a href="#quick-start">Quick start</a> ·
+    <a href="#features">Features</a> ·
+    <a href="#screenshots">Screenshots</a> ·
+    <a href="#architecture">Architecture</a> ·
+    <a href="#api">API</a> ·
+    <a href="#roadmap">Roadmap</a>
+  </p>
+
+  <img src=".github/assets/demo.gif" width="880" alt="Creating a note, completing a task and switching the interface to Russian">
+</div>
+
+## Contents
+
+- [Features](#features)
+- [Built with](#built-with)
+- [Screenshots](#screenshots)
+- [Quick start](#quick-start)
+- [Architecture](#architecture)
+- [API](#api)
+- [Local development](#local-development)
+- [Quality](#quality)
+- [Project structure](#project-structure)
+- [Roadmap](#roadmap)
+- [License](#license)
 
 ## Features
 
-- Sign up and sign in with a username and password (JWT bearer tokens).
-- Notes with a title, an optional body and due date, a status (`todo`, `in_progress`, `done`,
-  or none for a plain note), and any number of categories.
-- Personal categories with names that are unique regardless of case.
-- Note list filtered by status, category and due date range, with pagination.
-- Soft delete everywhere: deleted records stay in the database and disappear from the API.
-- Every user sees only their own data.
-- English and Russian UI with a language switcher. Dates are shown in the browser's time zone.
+- 📝 **Notes and tasks.** A title, an optional body and due date, and a status: `todo`,
+  `in_progress`, `done`, or none for a plain note.
+- 🏷️ **Categories.** Any number per note. Names are unique per user regardless of case,
+  in any language.
+- 🔎 **Filters that live in the URL.** Status, category, due date range and quick views
+  (Today, Overdue, No due date), with pagination.
+- 🌍 **English and Russian.** A language switcher, dates in the browser's locale and time zone,
+  and translated API errors.
+- 🔐 **Private by default.** Sign up and sign in with JWT. Every user sees only their own data.
+- 🗑️ **Soft delete.** Deleted records stay in the database and disappear from the API.
+- 💾 **Nothing gets lost.** When a session expires, a sign-in dialog opens over the current page,
+  and the editor keeps a local draft until the save succeeds.
+- 🧬 **Typed end to end.** The OpenAPI snapshot generates the frontend types, so API drift breaks
+  the build, not production.
+- 🐳 **One-command deploy.** Docker Compose runs the backend, the SPA and a reverse proxy.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Built with
+
+<p>
+  <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"></a>
+  <a href="https://www.sqlalchemy.org"><img src="https://img.shields.io/badge/SQLAlchemy-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white" alt="SQLAlchemy"></a>
+  <a href="https://docs.pydantic.dev"><img src="https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic"></a>
+  <a href="https://sqlite.org"><img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"></a>
+  <a href="https://alembic.sqlalchemy.org"><img src="https://img.shields.io/badge/Alembic-6BA81E?style=for-the-badge" alt="Alembic"></a>
+  <a href="https://docs.astral.sh/uv/"><img src="https://img.shields.io/badge/uv-DE5FE9?style=for-the-badge&logo=uv&logoColor=white" alt="uv"></a>
+</p>
+<p>
+  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"></a>
+  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"></a>
+  <a href="https://vite.dev"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"></a>
+  <a href="https://tanstack.com"><img src="https://img.shields.io/badge/TanStack-FF4154?style=for-the-badge&logo=reactquery&logoColor=white" alt="TanStack Router and Query"></a>
+  <a href="https://www.i18next.com"><img src="https://img.shields.io/badge/i18next-26A69A?style=for-the-badge&logo=i18next&logoColor=white" alt="i18next"></a>
+</p>
+<p>
+  <a href="https://www.docker.com"><img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
+  <a href="https://caddyserver.com"><img src="https://img.shields.io/badge/Caddy-1F88C0?style=for-the-badge&logo=caddy&logoColor=white" alt="Caddy"></a>
+  <a href="https://github.com/features/actions"><img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"></a>
+</p>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src=".github/assets/notes.png" alt="Notes list"><p align="center"><sub><b>Notes</b>: statuses, due dates and categories at a glance</sub></p></td>
+    <td width="50%"><img src=".github/assets/notes-filtered.png" alt="Filtered notes list"><p align="center"><sub><b>Filters</b>: status and category, kept in the URL</sub></p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src=".github/assets/note-editor.png" alt="Note editor"><p align="center"><sub><b>Editor</b>: due date, status and categories</sub></p></td>
+    <td width="50%"><img src=".github/assets/categories.png" alt="Categories page"><p align="center"><sub><b>Categories</b>: create, rename and delete</sub></p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src=".github/assets/notes-ru.png" alt="Russian interface"><p align="center"><sub><b>Russian UI</b>: dates follow the selected language</sub></p></td>
+    <td width="50%"><img src=".github/assets/sign-in.png" alt="Sign-in page"><p align="center"><sub><b>Sign in</b>: with a language switcher</sub></p></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src=".github/assets/swagger.png" alt="Swagger UI"><p align="center"><sub><b>Swagger UI</b>: every endpoint, including error responses, is described in OpenAPI</sub></p></td>
+  </tr>
+</table>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Quick start
+
+Requirements: Docker with the Compose plugin.
+
+```bash
+git clone https://github.com/KonstantinVasilkov/todo-app.git
+cd todo-app
+export JWT_SECRET="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"
+docker compose up -d --build
+```
+
+| URL | What |
+|---|---|
+| http://localhost:8080 | the app |
+| http://localhost:8080/api | the API |
+| http://localhost:8080/api/docs | Swagger UI |
+
+```bash
+docker compose down      # stop; data is kept
+docker compose down -v   # stop and delete the database volume
+```
+
+<details>
+<summary><b>What runs inside</b></summary>
+
+- **`backend`** (`Dockerfile`):
+  - Python 3.14 slim with dependencies installed by `uv` from `uv.lock`, running as an
+    unprivileged user.
+  - On start it applies migrations (`alembic upgrade head`), then runs
+    `fastapi run --root-path /api` on port 8000.
+  - The port is not published; only `web` reaches it.
+  - SQLite lives in the `todo-data` volume at `/data/todo.db`.
+- **`web`** (`docker/frontend.Dockerfile`):
+  - Node builds the SPA, then Caddy serves it on port 80 (published as 8080).
+  - Caddy falls back to `index.html` for client-side routes and proxies `/api/*` to `backend`
+    with the prefix stripped.
+  - It starts once the backend health check passes.
+
+Caddy serves plain HTTP. To expose the app publicly, put it behind a TLS-terminating proxy or
+give Caddy a domain name.
+
+</details>
+
+<details>
+<summary><b>Configuration</b></summary>
+
+| Variable | Default | Notes |
+|---|---|---|
+| `JWT_SECRET` | none | Required, at least 32 characters. Compose refuses to start without it. Can also be set in `.env` next to `docker-compose.yml`. |
+| `JWT_ALGORITHM` | `HS256` | |
+| `JWT_TTL_MINUTES` | `60` | |
+| `DATABASE_URL` | `sqlite+aiosqlite:///./todo.db` | Set to `sqlite+aiosqlite:////data/todo.db` in the image. |
+
+</details>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Architecture
 
@@ -37,52 +191,130 @@ flowchart LR
 
 - **Routers** (`app/api/`) handle HTTP, validate input with Pydantic and map domain
   exceptions to status codes. They hold no business logic and no sessions.
-- **Services** (`app/services/`) own the transaction. Each public method opens one
-  `unit_of_work`, which yields a session and the repositories bound to it. The transaction
-  commits on success and rolls back on any exception. Services return Pydantic schemas,
-  never ORM objects, and never call each other.
+- **Services** (`app/services/`) own the transaction:
+  - each public method opens one `unit_of_work`, which yields a session and the repositories
+    bound to it;
+  - it commits on success and rolls back on any exception;
+  - services return Pydantic schemas, never ORM objects, and never call each other.
 - **Repositories** (`app/repositories/`) build queries and never commit. `BaseRepository`
   always filters out soft-deleted rows and other users' rows, and fills the audit fields.
-- **Data model.** `users`, `notes` and `categories` share one set of base fields: `id`
-  (uuid4), `status`, `created_at`, `updated_at`, `created_by`, `updated_by` and `deleted_at`.
-  `created_by` is the owner. Notes and categories are linked many-to-many through
-  `note_category`. Uniqueness is enforced by partial unique indexes that ignore deleted rows.
-  Category names are compared by a `casefold()` key, so case-insensitivity works beyond ASCII.
-- **Auth.** Passwords are hashed with argon2 (`pwdlib`). Access tokens are HS256 JWTs
-  (PyJWT) that live 60 minutes. There are no refresh tokens.
+- **Data model:**
+  - `users`, `notes` and `categories` share one set of base fields: `id` (uuid4), `status`,
+    `created_at`, `updated_at`, `created_by`, `updated_by` and `deleted_at`;
+  - `created_by` is the owner;
+  - notes and categories are linked many-to-many through `note_category`;
+  - partial unique indexes ignore deleted rows;
+  - category names compare by a `casefold()` key, so case-insensitivity works beyond ASCII.
+- **Auth.** Passwords are hashed with argon2 (`pwdlib`). Access tokens are HS256 JWTs that live
+  60 minutes.
 - **Errors.** `409` and domain `422` responses use FastAPI's list format,
   `{"detail": [{"loc": [...], "msg": "...", "type": "conflict"}]}`, so clients handle both the
-  same way. All error responses are described in the OpenAPI schema.
+  same way. Every error response is described in the OpenAPI schema.
 - **Migrations.** Alembic runs in async, batch mode, which SQLite needs to alter tables.
 
 ### API contract
 
-`openapi.json` in the repository root is a snapshot of the API schema.
+```mermaid
+flowchart LR
+    A[FastAPI app] -- "scripts/export_openapi.py" --> O[openapi.json]
+    O -- "npm run api:gen" --> T[frontend/src/api/schema.ts]
+    A -. "pytest: snapshot is current" .- O
+    T -. "npm run api:check: types are current" .- O
+```
 
-- The backend owns it: `scripts/export_openapi.py` writes it, and a test fails if the snapshot
-  differs from the running app.
-- The frontend generates its types from it (`npm run api:gen`). `npm run api:check` fails when
-  those types are stale.
-- A renamed endpoint, field or enum value therefore breaks the frontend typecheck rather than
-  production.
+`openapi.json` in the repository root is a snapshot of the API schema:
+- the backend owns it, and a test fails when it differs from the app;
+- the frontend generates its types from it;
+- a renamed endpoint, field or enum value breaks the frontend typecheck.
 
 ### Frontend
 
-- **Stack.** Vite, React, TypeScript, TanStack Router and TanStack Query, with `openapi-fetch`
-  as the typed API client.
-- **Filters and pagination** live in typed URL search params. The list loads more pages on
-  demand. Status changes are optimistic.
-- **Session expiry.** A `401` on an authenticated request opens a sign-in dialog over the
-  current page, so unsaved input stays. The note editor also keeps a local draft until a save
-  succeeds.
-- **i18n.** Built on `i18next` and `react-i18next`:
-  - English is the default and fallback language; Russian is the second one.
-  - The language comes from the saved choice, otherwise from the browser.
-  - Translation keys are typed, so a missing key is a compile error.
-  - API errors are translated by their `type` and field. The server's message is only a
-    fallback.
+- **Routing and data.** TanStack Router keeps filters in typed URL search params. TanStack
+  Query fetches the list page by page on demand and updates statuses optimistically.
+- **API client.** `openapi-fetch` is typed by the generated `paths`, and so are the MSW mocks in
+  tests.
+- **Session expiry.** A `401` opens a sign-in dialog over the current page, so unsaved input
+  stays.
+- **i18n.** `i18next` with English as the default and fallback language and Russian as the
+  second one:
+  - translation keys are typed, so a missing key is a compile error;
+  - a test keeps both locales in sync;
+  - API errors are translated by their `type` and field, with the server message as a fallback.
 
-### Repository layout
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## API
+
+All endpoints except `/auth/*` require `Authorization: Bearer <token>`.
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/auth/register` | Create an account |
+| `POST` | `/auth/login` | Get an access token (OAuth2 password form) |
+| `GET` | `/users/me` | Current user |
+| `GET` | `/notes` | List notes with filters and pagination |
+| `POST` | `/notes` | Create a note |
+| `GET` `PATCH` `DELETE` | `/notes/{id}` | Read, partially update or soft-delete a note |
+| `GET` `POST` | `/categories` | List or create categories |
+| `PATCH` `DELETE` | `/categories/{id}` | Rename or soft-delete a category |
+
+`GET /notes` takes:
+- **`status`**: repeatable; `todo`, `in_progress`, `done`, or `none` for plain notes;
+- **`category_id`**: repeatable, matches notes in any of the categories;
+- **`due_from`**, **`due_to`**: a due date range;
+- **`has_due`**: notes with or without a due date;
+- **`limit`** and **`offset`**: pagination, up to 100 per page.
+
+Several values of one filter mean OR; different filters combine with AND.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Local development
+
+Requirements: Python 3.14 with [uv](https://docs.astral.sh/uv/), and Node.js 20.19 or newer
+with npm 11. npm 10.8 fails on this lockfile; use `npx npm@11 install`.
+
+```bash
+cp .env.example .env   # then set JWT_SECRET
+uv sync
+uv run alembic upgrade head
+uv run fastapi dev app/main.py --root-path /api
+```
+
+In another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev            # http://localhost:5173, proxies /api/* to http://localhost:8000
+```
+
+Set `API_URL` to point the dev proxy at another backend address. After changing the API,
+refresh the contract and the frontend types:
+
+```bash
+uv run python scripts/export_openapi.py
+cd frontend && npm run api:gen
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Quality
+
+| Check | Command |
+|---|---|
+| Lint and format | `uv run ruff check . && uv run ruff format --check .` |
+| Type check | `uv run ty check` |
+| Backend tests | `uv run pytest` |
+| Frontend: contract, typecheck, lint, tests | `cd frontend && npm run check` |
+
+CI runs all of the above on every push and pull request, and builds the Docker images. The
+backend tests also include a hygiene check: Cyrillic text is allowed only in
+`frontend/src/i18n/locales/ru.json`.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Project structure
 
 ```
 app/                  FastAPI application
@@ -105,90 +337,26 @@ docker-compose.yml    full stack
 openapi.json          API contract snapshot
 ```
 
-## Deployment with Docker
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Requirements: Docker with the Compose plugin.
+## Roadmap
 
-```bash
-export JWT_SECRET="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"
-docker compose up -d --build
-```
+- [x] Notes, categories, filters and pagination
+- [x] English and Russian UI
+- [x] Typed API contract checked in CI
+- [x] One-command Docker deployment
+- [ ] Sharing notes and categories with other users
+- [ ] Due date reminders
+- [ ] Subtasks and checklists
+- [ ] Full-text search (SQLite FTS5)
+- [ ] Refresh tokens and "sign out everywhere"
+- [ ] Sync across devices. Soft delete already keeps the tombstones that incremental sync needs.
+- [ ] PostgreSQL as a deployment option
 
-| URL | What |
-|---|---|
-| http://localhost:8080 | the app |
-| http://localhost:8080/api | the API |
-| http://localhost:8080/api/docs | Swagger UI |
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```bash
-docker compose down      # stop; data is kept
-docker compose down -v   # stop and delete the database volume
-```
+## License
 
-### What runs
+Distributed under the MIT License. See [`LICENSE`](LICENSE).
 
-- **`backend`** (`Dockerfile`):
-  - Python 3.14 slim with dependencies installed by `uv` from `uv.lock`, running as an
-    unprivileged user.
-  - On start it applies migrations (`alembic upgrade head`), then runs
-    `fastapi run --root-path /api` on port 8000.
-  - The port is not published; only `web` reaches it.
-  - SQLite lives in the `todo-data` volume at `/data/todo.db`.
-- **`web`** (`docker/frontend.Dockerfile`):
-  - Node builds the SPA, then Caddy serves it on port 80 (published as 8080).
-  - Caddy falls back to `index.html` for client-side routes and proxies `/api/*` to `backend`.
-  - It starts once the backend health check passes.
-
-### Configuration
-
-| Variable | Default | Notes |
-|---|---|---|
-| `JWT_SECRET` | none | Required, at least 32 characters. Compose refuses to start without it. Can also be set in `.env` next to `docker-compose.yml`. |
-| `JWT_ALGORITHM` | `HS256` | |
-| `JWT_TTL_MINUTES` | `60` | |
-| `DATABASE_URL` | `sqlite+aiosqlite:///./todo.db` | Set to `sqlite+aiosqlite:////data/todo.db` in the image. |
-
-Caddy serves plain HTTP. To expose the app publicly, put it behind a TLS-terminating proxy
-or give Caddy a domain name.
-
-## Local development
-
-Requirements: Python 3.14 with [uv](https://docs.astral.sh/uv/), and Node.js 20.19 or newer
-with npm 11. npm 10.8 fails on this lockfile; use `npx npm@11 install`.
-
-Backend:
-
-```bash
-cp .env.example .env   # then set JWT_SECRET
-uv sync
-uv run alembic upgrade head
-uv run fastapi dev app/main.py --root-path /api
-```
-
-Frontend, in another terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev            # http://localhost:5173, proxies /api/* to http://localhost:8000
-```
-
-Set `API_URL` to point the dev proxy at another backend address.
-
-After changing the API, refresh the contract and the frontend types:
-
-```bash
-uv run python scripts/export_openapi.py
-cd frontend && npm run api:gen
-```
-
-## Checks
-
-```bash
-uv run pytest                                          # backend tests
-uv run ruff check . && uv run ruff format --check .    # lint and formatting
-cd frontend && npm run check                           # contract, typecheck, lint, tests
-```
-
-The backend test suite includes a hygiene check: Cyrillic text is allowed only in
-`frontend/src/i18n/locales/ru.json`.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
