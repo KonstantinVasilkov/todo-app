@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -24,7 +24,9 @@ _STATUS_BY_ERROR: dict[type[DomainError], int] = {
 }
 
 
-async def domain_error_handler(request: Request, exc: DomainError) -> JSONResponse:
+async def domain_error_handler(request: Request, exc: Exception) -> JSONResponse:
+    if not isinstance(exc, DomainError):
+        raise exc
     status_code = _STATUS_BY_ERROR.get(type(exc), status.HTTP_400_BAD_REQUEST)
     if exc.field is not None:
         item = DomainErrorItem(
@@ -42,7 +44,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
 
     @asynccontextmanager
-    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         engine = build_engine(settings.database_url)
         app.state.engine = engine
         app.state.session_factory = build_session_factory(engine)

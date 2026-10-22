@@ -1,4 +1,4 @@
-from datetime import UTC
+from datetime import UTC, timedelta
 from uuid import UUID, uuid4
 
 import pytest
@@ -26,7 +26,7 @@ async def test_add_sets_audit_fields(session_factory: async_sessionmaker[AsyncSe
         assert cat.id.version == 4
         assert cat.created_at == cat.updated_at
         assert cat.created_at.tzinfo is not None
-        assert cat.created_at.utcoffset().total_seconds() == 0
+        assert cat.created_at.utcoffset() == timedelta(0)
         assert cat.created_at.tzinfo is UTC or cat.created_at.tzname() == "UTC"
         assert cat.created_by == cat.updated_by == actor
 

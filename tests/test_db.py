@@ -72,6 +72,7 @@ async def test_utc_datetime_converts_offset_to_utc(session_factory):
         session.add(note)
     loaded = await _read_due(session_factory, note.id)
     assert loaded == datetime(2026, 10, 21, 12, 0, tzinfo=UTC)
+    assert loaded is not None
     assert loaded.tzinfo is UTC
 
 

@@ -14,7 +14,7 @@ class NoteRepository(BaseRepository[Note]):
     model = Note
     default_order = (Note.due.asc().nulls_last(), Note.created_at.desc())
 
-    def select(self) -> Select[tuple[Note]]:
+    def select(self) -> Select[Note]:
         return super().select().options(selectinload(Note.categories))
 
     async def remove_category_links(self, category_id: UUID) -> None:

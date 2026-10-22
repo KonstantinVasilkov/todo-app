@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from uuid import UUID
 
@@ -19,6 +19,6 @@ class UnitOfWork:
 @asynccontextmanager
 async def unit_of_work(
     session_factory: async_sessionmaker[AsyncSession], actor_id: UUID | None
-) -> AsyncIterator[UnitOfWork]:
+) -> AsyncGenerator[UnitOfWork]:
     async with session_factory() as session, session.begin():
         yield UnitOfWork(session, actor_id)

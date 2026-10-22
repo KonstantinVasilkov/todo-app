@@ -34,11 +34,11 @@ class NoteCreate(BaseModel):
 
 
 class NoteUpdate(BaseModel):
-    title: Title = None  # type: ignore[assignment]
+    title: Title = None  # ty: ignore[invalid-assignment]
     body: str | None = None
     due: UTCDatetime | None = None
     status: NoteStatus | None = None
-    category_ids: list[UUID] = None  # type: ignore[assignment]
+    category_ids: list[UUID] = None  # ty: ignore[invalid-assignment]
 
 
 class NoteRead(BaseModel):

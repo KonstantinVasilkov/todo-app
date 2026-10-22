@@ -3,23 +3,25 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import ColumnElement, Select, func
+from sqlalchemy import ColumnElement, ColumnExpressionArgument, Select, func
 from sqlalchemy import select as sa_select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.base import EntityMixin
 
+type OrderBy = Sequence[ColumnExpressionArgument[Any]]
+
 
 class BaseRepository[M: EntityMixin]:
     model: type[M]
     owner_scoped: bool = True
-    default_order: tuple[ColumnElement[Any], ...] = ()
+    default_order: OrderBy = ()
 
     def __init__(self, session: AsyncSession, actor_id: UUID | None):
         self.session = session
         self.actor_id = actor_id
 
-    def select(self) -> Select[tuple[M]]:
+    def select(self) -> Select[M]:
         stmt = sa_select(self.model).where(self.model.deleted_at.is_(None))
         if self.owner_scoped:
             stmt = stmt.where(self.model.created_by == self.actor_id)
@@ -30,9 +32,7 @@ class BaseRepository[M: EntityMixin]:
             raise ValueError("actor_id is required for write operations")
         return self.actor_id
 
-    def apply_filters(
-        self, stmt: Select[tuple[M]], *where: ColumnElement[bool], **eq: Any
-    ) -> Select[tuple[M]]:
+    def apply_filters(self, stmt: Select[M], *where: ColumnElement[bool], **eq: Any) -> Select[M]:
         return stmt.where(*where).filter_by(**eq)
 
     async def get(self, id: UUID) -> M | None:
@@ -45,7 +45,7 @@ class BaseRepository[M: EntityMixin]:
     async def list(
         self,
         *where: ColumnElement[bool],
-        order_by: Sequence[ColumnElement[Any]] | None = None,
+        order_by: OrderBy | None = None,
         **eq: Any,
     ) -> Sequence[M]:
         stmt = self.apply_filters(self.select(), *where, **eq)
@@ -62,7 +62,7 @@ class BaseRepository[M: EntityMixin]:
         *where: ColumnElement[bool],
         limit: int,
         offset: int = 0,
-        order_by: Sequence[ColumnElement[Any]] | None = None,
+        order_by: OrderBy | None = None,
         **eq: Any,
     ) -> tuple[Sequence[M], int]:
         total = await self.count(*where, **eq)
