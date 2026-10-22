@@ -326,6 +326,12 @@ CI runs all of the above on every push and pull request, and builds the Docker i
 backend tests also include a hygiene check: Cyrillic text is allowed only in
 `frontend/src/i18n/locales/ru.json`.
 
+To run the same checks locally before every push, enable the repository hooks once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Project structure
