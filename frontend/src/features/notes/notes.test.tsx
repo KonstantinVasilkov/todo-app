@@ -29,7 +29,7 @@ describe('notes list', () => {
         note({ id: 'n2', title: 'Article idea', status: null }),
       ]),
     )
-    renderApp('/')
+    renderApp('/notes')
 
     const late = (await screen.findByText('Submit report')).closest('li')!
     expect(within(late).getByText('yesterday')).toHaveClass('overdue')
@@ -43,7 +43,7 @@ describe('notes list', () => {
   it('requests the filters written in the URL', async () => {
     stubShell()
     const queries = stubNotes()
-    renderApp('/?due=overdue')
+    renderApp('/notes?due=overdue')
 
     expect(await screen.findByRole('heading', { name: en.notes.title.overdue })).toBeInTheDocument()
     await waitFor(() => expect(queries).toHaveLength(1))
@@ -55,7 +55,7 @@ describe('notes list', () => {
   it('switches views and status filters through the URL', async () => {
     stubShell([category({ id: 'c1', name: 'Home' })])
     const queries = stubNotes()
-    const { user, history } = renderApp('/')
+    const { user, history } = renderApp('/notes')
     await screen.findByRole('heading', { name: en.notes.title.all })
 
     await user.click(screen.getByRole('link', { name: en.filters.view.none }))
@@ -69,6 +69,7 @@ describe('notes list', () => {
 
     await user.click(screen.getByRole('checkbox', { name: 'Home' }))
     await waitFor(() => expect(queries.at(-1)!.getAll('category_id')).toEqual(['c1']))
+    expect(history.location.pathname).toBe('/notes')
     expect(history.location.search).toContain('due=none')
   })
 
@@ -84,7 +85,7 @@ describe('notes list', () => {
         return HttpResponse.json(note({ id: 'n1', title: 'Buy milk', status: 'done' }))
       }),
     )
-    const { user } = renderApp('/')
+    const { user } = renderApp('/notes')
 
     const box = await screen.findByRole('checkbox', { name: markDone('Buy milk') })
     await user.click(box)
@@ -99,7 +100,7 @@ describe('notes list', () => {
     stubShell()
     stubNotes(() => page([note({ id: 'n1', title: 'Buy milk', status: 'todo' })]))
     server.use(http.patch(api('/notes/{note_id}'), () => HttpResponse.json({ detail: 'boom' }, { status: 500 })))
-    const { user } = renderApp('/')
+    const { user } = renderApp('/notes')
 
     const box = await screen.findByRole('checkbox', { name: markDone('Buy milk') })
     await user.click(box)
@@ -115,7 +116,7 @@ describe('notes list', () => {
     const queries = stubNotes((q) =>
       q.get('offset') === '0' ? page(first, { total: 25 }) : page(second, { total: 25, offset: 20 }),
     )
-    const { user } = renderApp('/')
+    const { user } = renderApp('/notes')
 
     expect(await screen.findByText(en.notes.shown.replace('{{shown}}', '20').replace('{{total}}', '25'))).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: en.notes.loadMore }))
@@ -128,7 +129,7 @@ describe('notes list', () => {
   it('says when nothing matches', async () => {
     stubShell()
     stubNotes(() => page([]))
-    renderApp('/?due=today')
+    renderApp('/notes?due=today')
 
     expect(await screen.findByText(en.notes.empty)).toBeInTheDocument()
   })
@@ -136,7 +137,7 @@ describe('notes list', () => {
   it('renders the page in Russian after switching language', async () => {
     stubShell()
     stubNotes()
-    renderApp('/')
+    renderApp('/notes')
     await screen.findByRole('heading', { name: en.notes.title.all })
 
     await act(() => i18n.changeLanguage('ru'))

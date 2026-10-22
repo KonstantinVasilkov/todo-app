@@ -25,6 +25,28 @@ export function todayKey(now: Date): string {
   return dayKey(now)
 }
 
+export function dateKey(date: Date): string {
+  return dayKey(date)
+}
+
+export function dateOf(key: string): Date {
+  return new Date(...parseDay(key))
+}
+
+export function addDays(key: string, days: number): string {
+  const [year, month, date] = parseDay(key)
+  return dayKey(new Date(year, month, date + days))
+}
+
+export function dayKeyOf(iso: string): string {
+  return dayKey(new Date(iso))
+}
+
+export function minutesOfDay(iso: string): number {
+  const date = new Date(iso)
+  return date.getHours() * 60 + date.getMinutes()
+}
+
 export function dueToISO(date: string, time: string): string | null {
   if (!date) return null
   const [year, month, day] = parseDay(date)

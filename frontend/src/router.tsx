@@ -5,7 +5,9 @@ import { RegisterPage } from './auth/RegisterPage'
 import type { Session } from './auth/session'
 import { AppLayout } from './components/AppLayout'
 import { RootLayout } from './components/RootLayout'
+import { parseHomeSearch, parseNewNoteSearch } from './features/calendar/search'
 import { CategoriesPage } from './features/categories/CategoriesPage'
+import { HomePage } from './features/home/HomePage'
 import { EditNotePage, NewNotePage } from './features/notes/NoteEditorPages'
 import { NotesPage } from './features/notes/NotesPage'
 import { parseNotesSearch } from './features/notes/filters'
@@ -38,14 +40,26 @@ const appRoute = createRoute({
   component: AppLayout,
 })
 
-const notesRoute = createRoute({
+const homeRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/',
+  validateSearch: parseHomeSearch,
+  component: HomePage,
+})
+
+const notesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/notes',
   validateSearch: parseNotesSearch,
   component: NotesPage,
 })
 
-const newNoteRoute = createRoute({ getParentRoute: () => appRoute, path: '/notes/new', component: NewNotePage })
+const newNoteRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/notes/new',
+  validateSearch: parseNewNoteSearch,
+  component: NewNotePage,
+})
 
 const noteRoute = createRoute({ getParentRoute: () => appRoute, path: '/notes/$noteId', component: EditNotePage })
 
@@ -54,7 +68,7 @@ const categoriesRoute = createRoute({ getParentRoute: () => appRoute, path: '/ca
 const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
-  appRoute.addChildren([notesRoute, newNoteRoute, noteRoute, categoriesRoute]),
+  appRoute.addChildren([homeRoute, notesRoute, newNoteRoute, noteRoute, categoriesRoute]),
 ])
 
 export function createAppRouter(context: RouterContext, history?: RouterHistory) {

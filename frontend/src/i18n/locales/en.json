@@ -6,6 +6,7 @@
     "label": "Language"
   },
   "nav": {
+    "calendar": "Calendar",
     "sections": "Sections",
     "notes": "Notes",
     "categories": "Categories",
@@ -127,5 +128,26 @@
     "server": "Server error, please try again",
     "notFound": "Not found. It may have been deleted.",
     "unknown": "Something went wrong"
+  },
+  "calendar": {
+    "view": "View",
+    "month": "Month",
+    "week": "Week",
+    "today": "Today",
+    "previous": "Previous",
+    "next": "Next",
+    "more": "+{{hidden}} more",
+    "addNote": "Add a note on {{date}}",
+    "now": "Current time"
+  },
+  "today": {
+    "title": "Today",
+    "empty": "Nothing due today",
+    "allDay": "All day"
+  },
+  "noDate": {
+    "title": "No date",
+    "subtitle": "Whenever you get to it",
+    "empty": "Nothing waiting"
   }
 }

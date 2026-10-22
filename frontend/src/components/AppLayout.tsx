@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useMe } from '../api/queries'
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher'
 import { useSession } from '../context'
+import './header.css'
 
 export function AppLayout() {
   const { t } = useTranslation()
@@ -22,10 +23,16 @@ export function AppLayout() {
     <div className="app">
       <header className="app-header">
         <Link to="/" className="brand">
+          <span className="logo" aria-hidden="true">
+            ✓
+          </span>
           {t('app.name')}
         </Link>
         <nav aria-label={t('nav.sections')} className="sections">
-          <Link to="/" activeOptions={{ includeSearch: false }}>
+          <Link to="/" activeOptions={{ exact: true, includeSearch: false }}>
+            {t('nav.calendar')}
+          </Link>
+          <Link to="/notes" activeOptions={{ includeSearch: false }}>
             {t('nav.notes')}
           </Link>
           <Link to="/categories">{t('nav.categories')}</Link>
@@ -37,6 +44,10 @@ export function AppLayout() {
             {t('nav.signOut')}
           </button>
         </div>
+        <Link to="/notes/new" className="new-note">
+          <span aria-hidden="true">+</span>
+          {t('notes.new')}
+        </Link>
       </header>
       <main className="app-main">
         <Outlet />

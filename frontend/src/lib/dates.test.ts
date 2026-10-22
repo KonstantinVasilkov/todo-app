@@ -1,5 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { dueFromISO, dueToISO, formatDue, localDayRange, todayKey } from './dates'
+import { addDays, dayKeyOf, dueFromISO, dueToISO, formatDue, localDayRange, minutesOfDay, todayKey } from './dates'
+
+describe('addDays', () => {
+  it('moves across month and year boundaries', () => {
+    expect(addDays('2026-10-31', 1)).toBe('2026-11-01')
+    expect(addDays('2026-03-01', -1)).toBe('2026-02-28')
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01')
+  })
+})
+
+describe('dayKeyOf', () => {
+  it('is the local calendar day of an instant', () => {
+    expect(dayKeyOf('2026-10-21T22:30:00Z')).toBe('2026-10-22')
+  })
+})
+
+describe('minutesOfDay', () => {
+  it('is the local time of an instant in minutes', () => {
+    expect(minutesOfDay('2026-10-21T11:30:00Z')).toBe(14 * 60 + 30)
+  })
+})
 
 describe('localDayRange', () => {
   it('covers the whole local day, expressed in UTC', () => {

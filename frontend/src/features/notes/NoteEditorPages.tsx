@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { getRouteApi, Link, useNavigate } from '@tanstack/react-router'
+import { getRouteApi, Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { formError } from '../../api/errors'
 import { useCreateNote, useDeleteNote, useNote, useUpdateNote } from '../../api/queries'
 import type { NoteRead } from '../../api/types'
@@ -9,18 +9,30 @@ import { NoteForm } from './NoteForm'
 import { emptyNoteForm, formFromNote, toNoteCreate, toNoteUpdate } from './formValues'
 
 const noteRoute = getRouteApi('/_app/notes/$noteId')
+const newNoteRoute = getRouteApi('/_app/notes/new')
+
+function useLeaveEditor() {
+  const router = useRouter()
+  const navigate = useNavigate()
+  return () => {
+    if (router.history.canGoBack()) router.history.back()
+    else void navigate({ to: '/' })
+  }
+}
 
 export function NewNotePage() {
   const { t } = useTranslation()
   const create = useCreateNote()
-  const navigate = useNavigate()
-  const draftKey = 'note:new'
+  const { date } = newNoteRoute.useSearch()
+  const leave = useLeaveEditor()
+  const draftKey = date ? `note:new:${date}` : 'note:new'
+  const initial = date ? { ...emptyNoteForm, dueDate: date, dueTime: '09:00' } : emptyNoteForm
 
   return (
     <section className="editor">
       <h1>{t('editor.newTitle')}</h1>
       <NoteForm
-        initial={emptyNoteForm}
+        initial={initial}
         draftKey={draftKey}
         draftBase={null}
         submitLabel={t('editor.create')}
@@ -30,10 +42,11 @@ export function NewNotePage() {
           create.mutate(toNoteCreate(values), {
             onSuccess: () => {
               clearDraft(draftKey)
-              void navigate({ to: '/' })
+              leave()
             },
           })
         }
+        onCancel={leave}
       />
     </section>
   )
@@ -51,7 +64,7 @@ export function EditNotePage() {
         <p role="alert" className="form-error">
           {formError(note.error)}
         </p>
-        <Link to="/">{t('common.backToList')}</Link>
+        <Link to="/notes">{t('common.backToList')}</Link>
       </section>
     )
   }
@@ -62,12 +75,12 @@ function EditNote({ note }: { note: NoteRead }) {
   const { t } = useTranslation()
   const update = useUpdateNote(note.id)
   const remove = useDeleteNote()
-  const navigate = useNavigate()
+  const leave = useLeaveEditor()
   const draftKey = `note:${note.id}`
 
   function done() {
     clearDraft(draftKey)
-    void navigate({ to: '/' })
+    leave()
   }
 
   return (
@@ -80,6 +93,7 @@ function EditNote({ note }: { note: NoteRead }) {
         submitLabel={t('common.save')}
         error={update.error ?? remove.error}
         pending={update.isPending}
+        onCancel={leave}
         onSubmit={(values) => {
           const patch = toNoteUpdate(note, values)
           if (Object.keys(patch).length === 0) return done()

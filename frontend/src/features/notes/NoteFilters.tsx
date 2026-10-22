@@ -14,7 +14,7 @@ function toggle<T>(list: T[] | undefined, value: T): T[] | undefined {
 
 export function NoteFilters({ search }: { search: NotesSearch }) {
   const { t } = useTranslation()
-  const navigate = useNavigate({ from: '/' })
+  const navigate = useNavigate({ from: '/notes' })
   const categories = useCategories()
   const update = (patch: Partial<NotesSearch>) => void navigate({ search: (prev) => ({ ...prev, ...patch }) })
   const filtered = Object.keys(search).length > 0
@@ -28,7 +28,7 @@ export function NoteFilters({ search }: { search: NotesSearch }) {
           {VIEWS.map((view) => (
             <li key={view.due ?? 'all'}>
               <Link
-                to="/"
+                to="/notes"
                 search={(prev) => ({ ...prev, due: view.due, from: undefined, to: undefined })}
                 activeOptions={{ exact: true }}
               >
@@ -89,7 +89,7 @@ export function NoteFilters({ search }: { search: NotesSearch }) {
         )}
 
         {filtered && (
-          <Link to="/" search={{}} className="reset">
+          <Link to="/notes" search={{}} className="reset">
             {t('filters.reset')}
           </Link>
         )}

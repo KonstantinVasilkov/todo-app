@@ -10,9 +10,22 @@ import {
 import { useApi } from '../context'
 import { fieldErrors } from './errors'
 import { toListParams, type NotesSearch } from '../features/notes/filters'
-import { constraints, type CategoryRead, type NoteCreate, type NotePage, type NoteRead, type NoteStatus, type NoteUpdate } from './types'
+import { OPEN_STATUSES } from '../features/notes/status'
+import {
+  constraints,
+  type CategoryRead,
+  type ListNotesParams,
+  type NoteCreate,
+  type NotePage,
+  type NoteRead,
+  type NoteStatus,
+  type NoteUpdate,
+} from './types'
 
 export const PAGE_SIZE = constraints.parameters['GET /notes'].limit.default
+const MAX_PAGE_SIZE = constraints.parameters['GET /notes'].limit.maximum
+
+type NoteSetParams = Omit<ListNotesParams, 'limit' | 'offset'>
 
 export const keys = {
   me: ['me'] as const,
@@ -20,6 +33,8 @@ export const keys = {
   notes: ['notes'] as const,
   noteLists: ['notes', 'list'] as const,
   noteList: (search: NotesSearch) => ['notes', 'list', search] as const,
+  noteSets: ['notes', 'all'] as const,
+  noteSet: (params: NoteSetParams) => ['notes', 'all', params] as const,
   note: (id: string) => ['notes', 'detail', id] as const,
 }
 
@@ -48,6 +63,35 @@ export function useNoteList(search: NotesSearch) {
   })
 }
 
+export function useAllNotes(params: NoteSetParams) {
+  const api = useApi()
+  return useQuery({
+    queryKey: keys.noteSet(params),
+    queryFn: async () => {
+      const notes: NoteRead[] = []
+      for (;;) {
+        const page = await api.listNotes({ ...params, limit: MAX_PAGE_SIZE, offset: notes.length })
+        notes.push(...page.items)
+        if (page.items.length === 0 || notes.length >= page.total) return notes
+      }
+    },
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useNotesDue(from: string, to: string) {
+  return useAllNotes({ due_from: from, due_to: to })
+}
+
+export function useUndatedNotes() {
+  return useAllNotes({ has_due: false, status: [...OPEN_STATUSES, 'none'] })
+}
+
+function invalidateNoteViews(queryClient: QueryClient) {
+  void queryClient.invalidateQueries({ queryKey: keys.noteLists })
+  void queryClient.invalidateQueries({ queryKey: keys.noteSets })
+}
+
 export function useNote(id: string) {
   const api = useApi()
   return useQuery({ queryKey: keys.note(id), queryFn: () => api.getNote(id) })
@@ -62,7 +106,7 @@ export function useCreateNote() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (body: NoteCreate) => api.createNote(body),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.noteLists }),
+    onSuccess: () => invalidateNoteViews(queryClient),
     onError: (error) => refreshStaleCategories(queryClient, error),
   })
 }
@@ -74,7 +118,7 @@ export function useUpdateNote(id: string) {
     mutationFn: (patch: NoteUpdate) => api.updateNote(id, patch),
     onSuccess: (updated) => {
       queryClient.setQueryData(keys.note(id), updated)
-      void queryClient.invalidateQueries({ queryKey: keys.noteLists })
+      invalidateNoteViews(queryClient)
     },
     onError: (error) => refreshStaleCategories(queryClient, error),
   })
@@ -98,6 +142,9 @@ export function useSetNoteStatus() {
             }
           : data,
       )
+      queryClient.setQueriesData<NoteRead[]>({ queryKey: keys.noteSets }, (list) =>
+        list?.map((n) => (n.id === id ? { ...n, status } : n)),
+      )
       queryClient.setQueryData<NoteRead>(keys.note(id), (n) => (n ? { ...n, status } : n))
       return { snapshot }
     },
@@ -113,7 +160,7 @@ export function useDeleteNote() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.deleteNote(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.noteLists }),
+    onSuccess: () => invalidateNoteViews(queryClient),
   })
 }
 

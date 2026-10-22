@@ -6,7 +6,7 @@ import { useNow } from '../../lib/useNow'
 import { NoteFilters } from './NoteFilters'
 import { NoteItem } from './NoteItem'
 
-const route = getRouteApi('/_app/')
+const route = getRouteApi('/_app/notes')
 
 export function NotesPage() {
   const { t } = useTranslation()

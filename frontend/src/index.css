@@ -1,17 +1,24 @@
 :root {
-  --bg: #f7f7f5;
+  --bg: #f4f6fb;
   --surface: #ffffff;
-  --text: #1f2328;
-  --muted: #6b7280;
-  --border: #e3e3df;
-  --accent: #2f6feb;
+  --surface-2: #eef2f8;
+  --card: rgba(255, 255, 255, 0.82);
+  --text: #1b2230;
+  --muted: #64708a;
+  --border: #dde3ee;
+  --accent: #3d6fe3;
+  --accent-2: #7c5ce6;
   --accent-text: #ffffff;
-  --danger: #c62828;
-  --chip: #eef1f6;
-  --radius: 8px;
+  --danger: #dc2626;
+  --chip: #eef2f8;
+  --weekend: #eef1f7;
+  --glow: rgba(61, 111, 227, 0.16);
+  --shadow: 0 10px 30px rgba(27, 34, 48, 0.08);
+  --radius: 10px;
+  --radius-lg: 16px;
 
   color-scheme: light dark;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text);
@@ -20,14 +27,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #15171a;
-    --surface: #1d2024;
-    --text: #e6e6e3;
-    --muted: #9aa0a8;
-    --border: #2e3238;
-    --accent: #5b8def;
-    --danger: #ef6b6b;
-    --chip: #2a2f36;
+    --bg: #0e1116;
+    --surface: #151a22;
+    --surface-2: #1b212b;
+    --card: rgba(21, 26, 34, 0.78);
+    --text: #e7ecf3;
+    --muted: #8b95a7;
+    --border: #252c38;
+    --accent: #6ea8fe;
+    --accent-2: #a78bfa;
+    --danger: #f87171;
+    --chip: #1f2632;
+    --weekend: #131820;
+    --glow: rgba(110, 168, 254, 0.18);
+    --shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
   }
 }
 
@@ -37,7 +50,44 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 520px at 12% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(900px 520px at 100% 0%, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.home {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.home-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .home {
+    grid-template-columns: 1fr;
+  }
+
+  .home > .calendar {
+    display: none;
+  }
 }
 
 h1 {
@@ -100,7 +150,8 @@ input:disabled {
 }
 
 .primary {
-  background: var(--accent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 80%, white), var(--accent));
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
   border-color: var(--accent);
   color: var(--accent-text);
 }
@@ -213,7 +264,7 @@ legend {
 }
 
 .app-main {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 1.5rem;
 }
@@ -236,9 +287,11 @@ legend {
 .card {
   width: min(100%, 380px);
   padding: 1.5rem;
-  background: var(--surface);
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -284,7 +337,7 @@ legend {
 }
 
 .views a.active {
-  background: var(--chip);
+  background: var(--surface-2);
   font-weight: 500;
 }
 
@@ -313,9 +366,10 @@ legend {
   list-style: none;
   margin: 0;
   padding: 0;
-  background: var(--surface);
+  background: var(--card);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
 }
 
 .note-item {
@@ -519,5 +573,16 @@ legend {
 
   .row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -29,6 +29,7 @@ describe('sign in', () => {
     const sections = within(screen.getByRole('navigation', { name: en.nav.sections }))
     expect(sections.getByRole('link', { name: en.nav.categories })).toHaveAttribute('aria-current', 'page')
     expect(sections.getByRole('link', { name: en.nav.notes })).not.toHaveAttribute('aria-current')
+    expect(sections.getByRole('link', { name: en.nav.calendar })).not.toHaveAttribute('aria-current')
     expect(form!.get('username')).toBe('kos')
     expect(session.isAuthenticated()).toBe(true)
   })
@@ -59,7 +60,7 @@ describe('language', () => {
 })
 
 describe('registration', () => {
-  it('registers, signs in and opens the notes', async () => {
+  it('registers, signs in and opens the calendar', async () => {
     stubShell()
     stubNotes(() => page([]))
     let registered: unknown = null
@@ -77,7 +78,7 @@ describe('registration', () => {
     await user.type(screen.getByLabelText(en.auth.password), 'secret-pass')
     await user.click(screen.getByRole('button', { name: en.auth.register.submit }))
 
-    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
     expect(registered).toEqual({ username: 'kos', email: 'kos@example.com', password: 'secret-pass' })
   })
 
@@ -118,7 +119,7 @@ describe('expired session', () => {
         return HttpResponse.json({ access_token: validToken(), token_type: 'bearer' })
       }),
     )
-    const { user } = renderApp('/')
+    const { user } = renderApp('/notes')
 
     const dialog = await screen.findByRole('dialog', { name: en.auth.relogin.title })
     await user.type(within(dialog).getByLabelText(en.auth.username), 'kos')
@@ -158,7 +159,7 @@ describe('expired session', () => {
 
     expect(screen.getByLabelText(en.editor.fields.title)).toHaveValue('Important')
     await user.click(screen.getByRole('button', { name: en.editor.create }))
-    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
     expect(created).toEqual([{ title: 'Important', status: 'todo', category_ids: [] }])
   })
 })

@@ -1,0 +1,198 @@
+.home-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.home-card-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.home-count {
+  font-size: 11px;
+  font-weight: 400;
+  background: var(--chip);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.home-sub {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.home-empty {
+  margin: 0;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.home-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home-row {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 8px 4px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.home-row.timed {
+  grid-template-columns: 4.5rem 16px 1fr;
+  gap: 8px;
+}
+
+.home-row:first-child,
+.home-now + .home-row {
+  border-top: 0;
+}
+
+.home-row:hover {
+  background: var(--surface-2);
+}
+
+.home-time {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.home-time.overdue {
+  color: var(--danger);
+}
+
+.home-check {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  border-radius: 5px;
+  border: 1.5px solid var(--muted);
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+}
+
+.home-check:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.home-check:checked::after {
+  content: '';
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid var(--accent-text);
+  border-bottom: 2px solid var(--accent-text);
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.home-check:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.home-dot {
+  width: 7px;
+  height: 7px;
+  margin: 6px 0 0 4px;
+  border-radius: 99px;
+  background: var(--muted);
+}
+
+.home-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home-title {
+  color: var(--text);
+  text-decoration: none;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+
+.home-title:hover {
+  color: var(--accent);
+}
+
+.home-row.done .home-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.home-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.home-tag {
+  font-size: 10.5px;
+  color: var(--tag-color);
+  background: color-mix(in srgb, var(--tag-color) 14%, transparent);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+
+.home-prog {
+  font-size: 10.5px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+
+.home-now {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--danger);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  margin: 2px 0;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+
+.home-now:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.home-now::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--danger), transparent);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-row {
+    transition: none;
+  }
+}

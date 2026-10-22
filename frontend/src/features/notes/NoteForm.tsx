@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fieldErrors, formError } from '../../api/errors'
@@ -16,6 +15,7 @@ export function NoteForm({
   error,
   pending,
   onSubmit,
+  onCancel,
   children,
 }: {
   initial: NoteFormValues
@@ -25,6 +25,7 @@ export function NoteForm({
   error: unknown
   pending: boolean
   onSubmit: (values: NoteFormValues) => void
+  onCancel: () => void
   children?: ReactNode
 }) {
   const { t } = useTranslation()
@@ -135,9 +136,9 @@ export function NoteForm({
         <button type="submit" className="primary" disabled={pending}>
           {submitLabel}
         </button>
-        <Link to="/" className="button ghost">
+        <button type="button" className="button ghost" onClick={onCancel}>
           {t('common.cancel')}
-        </Link>
+        </button>
         <span className="spacer" />
         {children}
       </div>

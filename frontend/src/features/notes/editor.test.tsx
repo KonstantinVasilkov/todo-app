@@ -1,8 +1,8 @@
-import { cleanup, screen, waitFor } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 import en from '../../i18n/locales/en.json'
-import { category, note, user as me } from '../../test/fixtures'
+import { category, note, page, user as me } from '../../test/fixtures'
 import { renderApp, stubNotes, stubShell } from '../../test/renderApp'
 import { api, server } from '../../test/server'
 
@@ -28,7 +28,7 @@ describe('new note', () => {
     await user.click(await screen.findByRole('checkbox', { name: 'Work' }))
     await user.click(screen.getByRole('button', { name: en.editor.create }))
 
-    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
     expect(created).toEqual({
       title: 'Submit report',
       body: 'quarterly',
@@ -90,7 +90,7 @@ describe('new note', () => {
     await waitFor(() => expect(screen.queryByRole('checkbox', { name: 'Work' })).not.toBeInTheDocument())
     await user.click(screen.getByRole('button', { name: en.editor.create }))
 
-    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
     expect(created).toEqual([{ title: 'Submit report', status: 'todo', category_ids: [] }])
   })
 
@@ -105,6 +105,49 @@ describe('new note', () => {
     expect(await screen.findByLabelText(en.editor.fields.title)).toHaveValue('Unfinished')
     await user.click(screen.getByRole('button', { name: en.editor.discardDraft }))
     expect(screen.getByLabelText(en.editor.fields.title)).toHaveValue('')
+  })
+
+  it('prefills the due date and time from the clicked day', async () => {
+    stubShell()
+    stubNotes()
+    let created: unknown = null
+    server.use(
+      http.post(api('/notes'), async ({ request }) => {
+        created = await request.json()
+        return HttpResponse.json(note(), { status: 201 })
+      }),
+    )
+    const { user } = renderApp('/notes/new?date=2026-10-22')
+
+    expect(await screen.findByLabelText(en.editor.fields.dueDate)).toHaveValue('2026-10-22')
+    expect(screen.getByLabelText(en.editor.fields.dueTime)).toHaveValue('09:00')
+    await user.type(screen.getByLabelText(en.editor.fields.title), 'Dentist')
+    await user.click(screen.getByRole('button', { name: en.editor.create }))
+
+    await waitFor(() => expect(created).toMatchObject({ title: 'Dentist', due: '2026-10-22T06:00:00.000Z' }))
+  })
+
+  it('goes to the calendar when cancelled with no history to return to', async () => {
+    stubShell()
+    stubNotes()
+    const { user, history } = renderApp('/notes/new')
+
+    await user.click(await screen.findByRole('button', { name: en.common.cancel }))
+
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
+    expect(history.location.pathname).toBe('/')
+  })
+
+  it('highlights the current section in the header', async () => {
+    stubShell()
+    stubNotes()
+    renderApp('/')
+
+    await screen.findByRole('heading', { name: en.nav.calendar })
+    const sections = within(screen.getByRole('navigation', { name: en.nav.sections }))
+    expect(sections.getByRole('link', { name: en.nav.calendar })).toHaveAttribute('aria-current', 'page')
+    expect(sections.getByRole('link', { name: en.nav.notes })).not.toHaveAttribute('aria-current')
+    expect(sections.getByRole('link', { name: en.nav.categories })).not.toHaveAttribute('aria-current')
   })
 })
 
@@ -141,8 +184,27 @@ describe('existing note', () => {
     await user.type(title, 'Call dad')
     await user.click(screen.getByRole('button', { name: en.common.save }))
 
-    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
     expect(patch).toEqual({ title: 'Call dad' })
+  })
+
+  it('returns to the list it was opened from after saving', async () => {
+    stubShell()
+    stubNotes(() => page([saved]))
+    server.use(
+      http.get(api('/notes/{note_id}'), () => HttpResponse.json(saved)),
+      http.patch(api('/notes/{note_id}'), () => HttpResponse.json({ ...saved, title: 'Call dad' })),
+    )
+    const { user, history } = renderApp('/notes')
+
+    await user.click(await screen.findByRole('link', { name: 'Call mom' }))
+    const title = await screen.findByLabelText(en.editor.fields.title)
+    await user.clear(title)
+    await user.type(title, 'Call dad')
+    await user.click(screen.getByRole('button', { name: en.common.save }))
+
+    await waitFor(() => expect(history.location.pathname).toBe('/notes'))
+    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
   })
 
   it('turns a task into a plain note with an explicit null status', async () => {
@@ -181,7 +243,7 @@ describe('existing note', () => {
     expect(deleted).toBe(false)
     await user.click(screen.getByRole('button', { name: en.common.confirmDelete }))
 
-    expect(await screen.findByRole('heading', { name: en.notes.title.all })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: en.nav.calendar })).toBeInTheDocument()
     expect(deleted).toBe(true)
   })
 
