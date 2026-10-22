@@ -1,0 +1,131 @@
+{
+  "app": {
+    "name": "Todo"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "nav": {
+    "sections": "Sections",
+    "notes": "Notes",
+    "categories": "Categories",
+    "signOut": "Sign out"
+  },
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Really delete?",
+    "backToList": "Back to list"
+  },
+  "auth": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "login": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "noAccount": "No account yet?",
+      "toRegister": "Sign up",
+      "wrongCredentials": "Wrong username or password"
+    },
+    "register": {
+      "title": "Sign up",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "toLogin": "Sign in"
+    },
+    "relogin": {
+      "title": "Session expired",
+      "hint": "Sign in again. Everything you typed on this page stays where it is."
+    }
+  },
+  "status": {
+    "todo": "To do",
+    "in_progress": "In progress",
+    "done": "Done",
+    "none": "Just a note"
+  },
+  "notes": {
+    "title": {
+      "all": "All notes",
+      "today": "Today",
+      "overdue": "Overdue",
+      "none": "No due date"
+    },
+    "new": "New note",
+    "empty": "Nothing here yet",
+    "shown": "Showing {{shown}} of {{total}}",
+    "loadMore": "Show more",
+    "markDone": "Done: {{title}}"
+  },
+  "filters": {
+    "views": "Views",
+    "view": {
+      "all": "All",
+      "today": "Today",
+      "overdue": "Overdue",
+      "none": "No due date"
+    },
+    "toggle": "Filters",
+    "toggleApplied": "Filters · {{applied}}",
+    "status": "Status",
+    "categories": "Categories",
+    "due": "Due",
+    "from": "from",
+    "to": "to",
+    "reset": "Reset filters"
+  },
+  "editor": {
+    "newTitle": "New note",
+    "editTitle": "Note",
+    "create": "Create",
+    "fields": {
+      "title": "Title",
+      "body": "Description",
+      "dueDate": "Due date",
+      "dueTime": "Time",
+      "status": "Status",
+      "categories": "Categories"
+    },
+    "draftRestored": "Restored an unsaved draft",
+    "discardDraft": "Discard draft",
+    "noCategories": "No categories yet.",
+    "createCategory": "Create one"
+  },
+  "categories": {
+    "title": "Categories",
+    "hint": "Deleting a category removes it from all notes; the notes themselves stay.",
+    "list": "Categories",
+    "new": "New category",
+    "add": "Add",
+    "name": "Name",
+    "rename": "Rename",
+    "renameNamed": "Rename {{name}}",
+    "deleteNamed": "Delete {{name}}"
+  },
+  "errors": {
+    "conflict": {
+      "default": "Already taken",
+      "username": "This username is already taken",
+      "email": "This email is already registered",
+      "name": "A category with this name already exists"
+    },
+    "invalid_reference": {
+      "default": "Refers to something that no longer exists",
+      "category_ids": "One of the selected categories no longer exists. The list has been refreshed."
+    },
+    "validation": {
+      "missing": "Required",
+      "string_too_short": "Too short",
+      "string_too_long": "Too long",
+      "string_pattern_mismatch": "Invalid format"
+    },
+    "network": "Cannot reach the server",
+    "sessionExpired": "Session expired. Sign in and save again.",
+    "server": "Server error, please try again",
+    "notFound": "Not found. It may have been deleted.",
+    "unknown": "Something went wrong"
+  }
+}
