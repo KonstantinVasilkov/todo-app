@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: .
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET to a random string of at least 32 characters}
+    volumes:
+      - todo-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/openapi.json')"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  todo-data: {}
