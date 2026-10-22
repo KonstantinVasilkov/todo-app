@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.1
         with:
           enable-cache: true
       - run: uv sync --frozen
@@ -42,4 +42,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - run: docker compose build
+      - name: Start the stack
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          docker compose up -d --build --wait
+      - name: Smoke test through the proxy
+        run: |
+          curl -fsS http://localhost:8080/ > /dev/null
+          curl -fsS http://localhost:8080/api/openapi.json > /dev/null
+          curl -fsS -X POST http://localhost:8080/api/auth/register \
+            -H 'Content-Type: application/json' \
+            -d '{"username":"ci-user","email":"ci@example.com","password":"ci-password-123"}' > /dev/null
+          curl -fsS -X POST http://localhost:8080/api/auth/login \
+            -d 'username=ci-user&password=ci-password-123' | grep -q access_token
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
