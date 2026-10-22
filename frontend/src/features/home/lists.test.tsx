@@ -55,7 +55,8 @@ describe('Today list', () => {
     expect(rows[2]).toHaveTextContent('Evening')
     expect(rows[3]).toHaveTextContent('Anytime')
     expect(rows[3]).toHaveTextContent(en.today.allDay)
-    expect(rows[0]).toHaveTextContent('09:00')
+    expect(rows[0]).toHaveTextContent('9:00 AM')
+    expect(rows[0]).not.toHaveTextContent('09:00')
   })
 
   it('shows done notes struck and checked', async () => {

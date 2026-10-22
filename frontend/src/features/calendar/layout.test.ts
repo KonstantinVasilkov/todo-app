@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { layoutCell, positionOf } from './layout'
+import { MONTH_AREA } from './geometry'
+import { layoutCell, NOW_HEIGHT, positionOf } from './layout'
 
 const area = { top: 20, bottom: 116, rowHeight: 16, gap: 2 }
 const at = (hours: number, minutes = 0) => hours * 60 + minutes
@@ -82,6 +83,57 @@ describe('layoutCell', () => {
   })
 
   it('is empty for a day without rows', () => {
-    expect(layoutCell([], area)).toEqual({ rows: [], more: null })
+    expect(layoutCell([], area)).toEqual({ rows: [], more: null, now: null })
+  })
+
+  describe('with the current time', () => {
+    const clear = (rows: { id: string; top: number }[], line: number, rowHeight: number) =>
+      rows.every((row) => row.top + rowHeight <= line || row.top >= line + NOW_HEIGHT)
+
+    it('keeps the now line between past and future rows without crossing any', () => {
+      const day = [
+        { id: 'standup', minutes: at(9, 30) },
+        { id: 'lunch', minutes: at(12, 30) },
+        { id: 'review', minutes: at(17) },
+        { id: 'groceries', minutes: at(19) },
+      ]
+
+      const { rows, now } = layoutCell(day, MONTH_AREA, at(14, 20))
+      const top = (id: string) => rows.find((row) => row.id === id)!.top
+
+      expect(now).not.toBeNull()
+      expect(top('lunch') + MONTH_AREA.rowHeight + MONTH_AREA.gap).toBeLessThanOrEqual(now!.top)
+      expect(now!.top + NOW_HEIGHT + MONTH_AREA.gap).toBeLessThanOrEqual(top('review'))
+      expect(clear(rows, now!.top, MONTH_AREA.rowHeight)).toBe(true)
+    })
+
+    it('counts a row due exactly now as past', () => {
+      const { rows, now } = layoutCell([{ id: 'a', minutes: at(14, 20) }], MONTH_AREA, at(14, 20))
+
+      expect(rows[0].top + MONTH_AREA.rowHeight).toBeLessThanOrEqual(now!.top)
+    })
+
+    it('puts the line above every row in the morning and below every row at night', () => {
+      const day = [
+        { id: 'a', minutes: at(9) },
+        { id: 'b', minutes: at(10) },
+      ]
+
+      const morning = layoutCell(day, MONTH_AREA, at(6))
+      const night = layoutCell(day, MONTH_AREA, at(23, 30))
+
+      expect(morning.now!.top + NOW_HEIGHT).toBeLessThanOrEqual(Math.min(...morning.rows.map((r) => r.top)))
+      expect(Math.max(...night.rows.map((r) => r.top)) + MONTH_AREA.rowHeight).toBeLessThanOrEqual(night.now!.top)
+    })
+
+    it('keeps rows clear of the line when the day overflows', () => {
+      const day = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((id, i) => ({ id, minutes: at(8 + i * 2) }))
+
+      const { rows, more, now } = layoutCell(day, MONTH_AREA, at(13))
+
+      expect(more).not.toBeNull()
+      expect(now!.top + NOW_HEIGHT).toBeLessThanOrEqual(more!.top)
+      expect(clear(rows, now!.top, MONTH_AREA.rowHeight)).toBe(true)
+    })
   })
 })

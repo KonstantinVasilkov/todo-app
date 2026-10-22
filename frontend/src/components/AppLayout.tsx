@@ -26,7 +26,7 @@ export function AppLayout() {
           <span className="logo" aria-hidden="true">
             ✓
           </span>
-          {t('app.name')}
+          <span className="brand-name">{t('app.name')}</span>
         </Link>
         <nav aria-label={t('nav.sections')} className="sections">
           <Link to="/" activeOptions={{ exact: true, includeSearch: false }}>
@@ -46,7 +46,7 @@ export function AppLayout() {
         </div>
         <Link to="/notes/new" className="new-note">
           <span aria-hidden="true">+</span>
-          {t('notes.new')}
+          <span className="new-note-label">{t('notes.new')}</span>
         </Link>
       </header>
       <main className="app-main">

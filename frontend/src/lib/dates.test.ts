@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { addDays, dayKeyOf, dueFromISO, dueToISO, formatDue, localDayRange, minutesOfDay, todayKey } from './dates'
+import { addDays, dayKeyOf, dueFromISO, dueToISO, formatDue, formatTime, localDayRange, minutesOfDay, todayKey } from './dates'
+
+describe('formatTime', () => {
+  it('drops the leading zero on a 12-hour clock', () => {
+    expect(formatTime('2026-10-21T06:30:00Z', 'en')).toBe('9:30 AM')
+    expect(formatTime('2026-10-21T14:00:00Z', 'en')).toBe('5:00 PM')
+  })
+
+  it('keeps two-digit hours on a 24-hour clock', () => {
+    expect(formatTime('2026-10-21T06:30:00Z', 'ru')).toBe('09:30')
+    expect(formatTime('2026-10-21T14:00:00Z', 'ru')).toBe('17:00')
+  })
+})
 
 describe('addDays', () => {
   it('moves across month and year boundaries', () => {
@@ -70,13 +82,13 @@ describe('formatDue', () => {
 
   it('names nearby days in words', () => {
     expect(formatDue('2026-10-21T20:59:59Z', now, 'en')).toBe('today')
-    expect(formatDue('2026-10-22T11:30:00Z', now, 'en')).toBe('tomorrow, 02:30 PM')
+    expect(formatDue('2026-10-22T11:30:00Z', now, 'en')).toBe('tomorrow, 2:30 PM')
     expect(formatDue('2026-10-20T20:59:59Z', now, 'en')).toBe('yesterday')
   })
 
   it('shows other dates with a day and month, time only when set', () => {
     expect(formatDue('2026-11-05T20:59:59Z', now, 'en')).toBe('Nov 5')
-    expect(formatDue('2026-11-05T06:15:00Z', now, 'en')).toBe('Nov 5, 09:15 AM')
+    expect(formatDue('2026-11-05T06:15:00Z', now, 'en')).toBe('Nov 5, 9:15 AM')
   })
 
   it('formats in the given language', () => {

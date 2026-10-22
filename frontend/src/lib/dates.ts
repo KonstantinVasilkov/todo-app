@@ -61,6 +61,13 @@ export function dueFromISO(iso: string | null): { date: string; time: string } {
   return { date: dayKey(due), time: isEndOfDay(due) ? '' : `${pad(due.getHours())}:${pad(due.getMinutes())}` }
 }
 
+export function formatTime(value: Date | string, locale: string): string {
+  const twelveHour = new Intl.DateTimeFormat(locale, { hour: 'numeric' }).resolvedOptions().hour12
+  return new Intl.DateTimeFormat(locale, { hour: twelveHour ? 'numeric' : '2-digit', minute: '2-digit' }).format(
+    new Date(value),
+  )
+}
+
 export function formatDue(iso: string, now: Date, locale: string): string {
   const { date, time } = dueFromISO(iso)
   const days = Math.round((Date.UTC(...parseDay(date)) - Date.UTC(...parseDay(dayKey(now)))) / 86_400_000)
@@ -69,5 +76,5 @@ export function formatDue(iso: string, now: Date, locale: string): string {
       ? new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(days, 'day')
       : new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(iso))
   if (!time) return label
-  return `${label}, ${new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(iso))}`
+  return `${label}, ${formatTime(iso, locale)}`
 }

@@ -1,11 +1,11 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import type { NoteRead } from '../../api/types'
-import { dateOf, dueFromISO, minutesOfDay } from '../../lib/dates'
+import { dateOf, dueFromISO, formatTime, minutesOfDay } from '../../lib/dates'
 import { isOverdue } from '../notes/status'
 import { noteColor } from './colors'
 import type { CalendarDay } from './grid'
-import { layoutCell, positionOf, type CellArea } from './layout'
+import { layoutCell, NOW_HEIGHT, type CellArea } from './layout'
 
 interface DayCellProps {
   day: CalendarDay
@@ -23,10 +23,10 @@ export function DayCell({ day, notes, area, height, today, showTime, now, locale
   const navigate = useNavigate({ from: '/' })
   const date = dateOf(day.key)
   const fullDate = new Intl.DateTimeFormat(locale, { dateStyle: 'full' }).format(date)
-  const timeFormat = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' })
   const layout = layoutCell(
     notes.map((note) => ({ id: note.id, minutes: minutesOfDay(note.due ?? '') })),
     area,
+    today ? now.getHours() * 60 + now.getMinutes() : undefined,
   )
   const byId = new Map(notes.map((note) => [note.id, note]))
   const classes = ['cal-day']
@@ -61,7 +61,7 @@ export function DayCell({ day, notes, area, height, today, showTime, now, locale
             title={note.title}
             style={{ top: row.top, height: area.rowHeight, ['--event-color' as string]: noteColor(note) ?? 'var(--muted)' }}
           >
-            {showTime && time ? <span className="cal-time">{timeFormat.format(new Date(note.due))}</span> : null}
+            {showTime && time ? <span className="cal-time">{formatTime(note.due, locale)}</span> : null}
             <span className="cal-title">{note.title}</span>
           </Link>
         )
@@ -76,12 +76,12 @@ export function DayCell({ day, notes, area, height, today, showTime, now, locale
           {t('calendar.more', { hidden: layout.more.count })}
         </button>
       ) : null}
-      {today ? (
+      {layout.now ? (
         <div
           className="cal-now"
           role="img"
           aria-label={t('calendar.now')}
-          style={{ top: positionOf(now.getHours() * 60 + now.getMinutes(), area) }}
+          style={{ top: layout.now.top + (NOW_HEIGHT - 2) / 2 }}
         />
       ) : null}
     </div>

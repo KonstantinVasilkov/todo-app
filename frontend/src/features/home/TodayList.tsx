@@ -2,7 +2,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNotesDue } from '../../api/queries'
 import type { NoteRead } from '../../api/types'
-import { dueFromISO, localDayRange, todayKey } from '../../lib/dates'
+import { dueFromISO, formatTime, localDayRange, todayKey } from '../../lib/dates'
 import { useNow } from '../../lib/useNow'
 import { NoteRow } from './NoteRow'
 import './home.css'
@@ -14,7 +14,6 @@ export function TodayList() {
   const range = localDayRange(todayKey(now))
   const { data } = useNotesDue(range.from, range.to)
   const headingId = useId()
-  const timeFormat = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' })
   const subtitle = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(now)
 
   const isTimed = (n: NoteRead) => n.due !== null && dueFromISO(n.due).time !== ''
@@ -33,14 +32,14 @@ export function TodayList() {
       <NoteRow
         key={n.id}
         note={n}
-        time={timed ? timeFormat.format(new Date(n.due as string)) : t('today.allDay')}
+        time={timed ? formatTime(n.due as string, locale) : t('today.allDay')}
         overdue={timed && past && n.status !== 'done'}
       />
     )
   })
   const nowLine = (
     <li key="now" className="home-now" aria-label={t('calendar.now')}>
-      <span>{timeFormat.format(now)}</span>
+      <span>{formatTime(now, locale)}</span>
     </li>
   )
   if (items.length > 0) rows.splice(pastCount, 0, nowLine)
