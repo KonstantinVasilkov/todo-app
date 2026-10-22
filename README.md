@@ -27,7 +27,7 @@
     <a href="#roadmap">Roadmap</a>
   </p>
 
-  <img src=".github/assets/demo.gif" width="880" alt="Creating a note, completing a task and switching the interface to Russian">
+  <img src=".github/assets/demo.gif" width="880" alt="Switching between month and week, adding a note from a calendar day, completing a task and switching the interface to Russian">
 </div>
 
 ## Contents
@@ -46,14 +46,17 @@
 
 ## Features
 
+- 📅 **Calendar home page.** A month or week view where every task sits at its time of day,
+  next to a **Today** list with a "now" line and a **No date** list. Click a day to plan
+  something on it. On a phone, the page shows just Today and No date.
 - 📝 **Notes and tasks.** A title, an optional body and due date, and a status: `todo`,
   `in_progress`, `done`, or none for a plain note.
-- 🏷️ **Categories.** Any number per note. Names are unique per user regardless of case,
-  in any language.
-- 🔎 **Filters that live in the URL.** Status, category, due date range and quick views
-  (Today, Overdue, No due date), with pagination.
+- 🏷️ **Categories.** Any number per note, each with its own color in the calendar. Names are
+  unique per user regardless of case, in any language.
+- 🔎 **Filters that live in the URL.** On the Notes page: status, category, due date range and
+  quick views (Today, Overdue, No due date), with pagination.
 - 🌍 **English and Russian.** A language switcher, dates in the browser's locale and time zone,
-  and translated API errors.
+  the first day of the week from the locale, and translated API errors.
 - 🔐 **Private by default.** Sign up and sign in with JWT. Every user sees only their own data.
 - 🗑️ **Soft delete.** Deleted records stay in the database and disappear from the API.
 - 💾 **Nothing gets lost.** When a session expires, a sign-in dialog opens over the current page,
@@ -93,19 +96,23 @@
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/assets/notes.png" alt="Notes list"><p align="center"><sub><b>Notes</b>: statuses, due dates and categories at a glance</sub></p></td>
-    <td width="50%"><img src=".github/assets/notes-filtered.png" alt="Filtered notes list"><p align="center"><sub><b>Filters</b>: status and category, kept in the URL</sub></p></td>
+    <td colspan="2"><img src=".github/assets/calendar-month.png" alt="Calendar month view with Today and No date lists"><p align="center"><sub><b>Month</b>: tasks placed by time of day, the current time on today, overflow folded into "+N more"</sub></p></td>
+  </tr>
+  <tr>
+    <td width="68%"><img src=".github/assets/calendar-week.png" alt="Calendar week view"><p align="center"><sub><b>Week</b>: the same time scale with more room per day</sub></p></td>
+    <td width="32%"><img src=".github/assets/mobile.png" alt="Phone layout with Today and No date lists"><p align="center"><sub><b>Phone</b>: just Today and No date</sub></p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src=".github/assets/calendar-ru.png" alt="Russian interface"><p align="center"><sub><b>Russian UI</b>: Monday first, 24-hour time</sub></p></td>
+    <td width="50%"><img src=".github/assets/notes.png" alt="Notes list"><p align="center"><sub><b>Notes</b>: every note with filters kept in the URL</sub></p></td>
   </tr>
   <tr>
     <td width="50%"><img src=".github/assets/note-editor.png" alt="Note editor"><p align="center"><sub><b>Editor</b>: due date, status and categories</sub></p></td>
     <td width="50%"><img src=".github/assets/categories.png" alt="Categories page"><p align="center"><sub><b>Categories</b>: create, rename and delete</sub></p></td>
   </tr>
   <tr>
-    <td width="50%"><img src=".github/assets/notes-ru.png" alt="Russian interface"><p align="center"><sub><b>Russian UI</b>: dates follow the selected language</sub></p></td>
     <td width="50%"><img src=".github/assets/sign-in.png" alt="Sign-in page"><p align="center"><sub><b>Sign in</b>: with a language switcher</sub></p></td>
-  </tr>
-  <tr>
-    <td colspan="2"><img src=".github/assets/swagger.png" alt="Swagger UI"><p align="center"><sub><b>Swagger UI</b>: every endpoint, including error responses, is described in OpenAPI</sub></p></td>
+    <td width="50%"><img src=".github/assets/swagger.png" alt="Swagger UI"><p align="center"><sub><b>Swagger UI</b>: every endpoint and error response in OpenAPI</sub></p></td>
   </tr>
 </table>
 
@@ -229,8 +236,15 @@ flowchart LR
 
 ### Frontend
 
-- **Routing and data.** TanStack Router keeps filters in typed URL search params. TanStack
-  Query fetches the list page by page on demand and updates statuses optimistically.
+- **Routing and data.** TanStack Router keeps the calendar period and the Notes filters in
+  typed URL search params. TanStack Query updates statuses optimistically across the
+  calendar and both lists.
+- **Calendar:**
+  - month and week grids start on the locale's first day of the week;
+  - each task is positioned by its time of day, and close tasks are pushed apart instead of
+    overlapping;
+  - category colors are derived from the category id, so the backend stores no colors;
+  - the calendar loads every page of `GET /notes` for the visible range.
 - **API client.** `openapi-fetch` is typed by the generated `paths`, and so are the MSW mocks in
   tests.
 - **Session expiry.** A `401` opens a sign-in dialog over the current page, so unsaved input
@@ -329,7 +343,7 @@ tests/                backend tests
 frontend/             React SPA
   src/api/            generated schema, client, error mapping, queries
   src/auth/           session, sign-in and sign-up
-  src/features/       notes and categories
+  src/features/       calendar, home page, notes and categories
   src/i18n/           i18n setup and locales (en.json, ru.json)
 docker/               web image and Caddyfile
 Dockerfile            backend image
@@ -342,6 +356,7 @@ openapi.json          API contract snapshot
 ## Roadmap
 
 - [x] Notes, categories, filters and pagination
+- [x] Calendar home page with month and week views
 - [x] English and Russian UI
 - [x] Typed API contract checked in CI
 - [x] One-command Docker deployment
